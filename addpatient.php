@@ -1,66 +1,56 @@
 <?php
-// Include database connection
-require_once 'dbh.php';
+require 'dbh.php'; // Include your database connection script
 
-// Retrieve POST data
-$doctor_email = isset($_POST['doctor_email']) ? $_POST['doctor_email'] : null;
-$patient_name = isset($_POST['patient_name']) ? $_POST['patient_name'] : null;
-$patient_age = isset($_POST['patient_age']) ? $_POST['patient_age'] : null;
-$patient_gender = isset($_POST['patient_gender']) ? $_POST['patient_gender'] : null;
-$patient_problem = isset($_POST['patient_problem']) ? $_POST['patient_problem'] : null;
-$appointment_date = isset($_POST['appointment_date']) ? $_POST['appointment_date'] : null;
-$patient_mobile_number = isset($_POST['patient_mobile_number']) ? $_POST['patient_mobile_number'] : null;
-$patient_address = isset($_POST['patient_address']) ? $_POST['patient_address'] : null;
+header('Content-Type: application/json');
+
+$postdata = file_get_contents("php://input");
+$request = json_decode($postdata);
+
+// Ensure all variables are properly escaped to prevent SQL injection (though PDO prepared statements handle this)
+$doctorid = $request->doctorid;
+$patient_name = $request->patient_name;
+$patient_age = $request->patient_age;
+$patient_gender = $request->patient_gender;
+$patient_problem = $request->patient_problem;
+$appointment_date = $request->appointment_date;
+$patient_mobile_number = $request->patient_mobile_number;
+$patient_address = $request->patient_address;
+$datetime = date('Y-m-d H:i:s'); // Get the current date and time
 
 try {
-    // Check database connection
-    if ($conn == null) {
-        throw new Exception('Failed to connect to the database.');
-    }
-
-    // Fetch doctorid using doctor_email from the doctorsignup table
-    $sql = "SELECT doctorid FROM doctorsignup WHERE email = :doctor_email";
-    $stmt = $conn->prepare($sql);
-    $stmt->bindParam(':doctor_email', $doctor_email, PDO::PARAM_STR);
-    $stmt->execute();
-    $doctor = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if (!$doctor) {
-        throw new Exception('Doctor not found.');
-    }
-
-    $doctorid = $doctor['doctorid'];
-
-    // Prepare and execute the SQL query to add a patient
-    $sql = "INSERT INTO add_patient (doctorid, patient_name, patient_age, patient_gender, patient_problem, appointment_date, patient_mobile_number, patient_address) 
-            VALUES (:doctorid, :patient_name, :patient_age, :patient_gender, :patient_problem, :appointment_date, :patient_mobile_number, :patient_address)";
+    // Prepare SQL statement
+    $stmt = $conn->prepare("INSERT INTO add_patient (doctorid, patient_name, patient_age, patient_gender, patient_problem, appointment_date, patient_mobile_number, patient_address, datetime)
+                           VALUES (:doctorid, :patient_name, :patient_age, :patient_gender, :patient_problem, :appointment_date, :patient_mobile_number, :patient_address, :datetime)");
     
-    $stmt = $conn->prepare($sql);
-    $stmt->bindParam(':doctorid', $doctorid, PDO::PARAM_INT);
-    $stmt->bindParam(':patient_name', $patient_name, PDO::PARAM_STR);
-    $stmt->bindParam(':patient_age', $patient_age, PDO::PARAM_INT);
-    $stmt->bindParam(':patient_gender', $patient_gender, PDO::PARAM_STR);
-    $stmt->bindParam(':patient_problem', $patient_problem, PDO::PARAM_STR);
-    $stmt->bindParam(':appointment_date', $appointment_date, PDO::PARAM_STR);
-    $stmt->bindParam(':patient_mobile_number', $patient_mobile_number, PDO::PARAM_INT);
-    $stmt->bindParam(':patient_address', $patient_address, PDO::PARAM_STR);
+    // Bind parameters
+    $stmt->bindParam(':doctorid', $doctorid);
+    $stmt->bindParam(':patient_name', $patient_name);
+    $stmt->bindParam(':patient_age', $patient_age);
+    $stmt->bindParam(':patient_gender', $patient_gender);
+    $stmt->bindParam(':patient_problem', $patient_problem);
+    $stmt->bindParam(':appointment_date', $appointment_date);
+    $stmt->bindParam(':patient_mobile_number', $patient_mobile_number);
+    $stmt->bindParam(':patient_address', $patient_address);
+    $stmt->bindParam(':datetime', $datetime); // Bind the current date and time
+    
+    // Execute the statement
+    $stmt->execute();
 
-    if ($stmt->execute()) {
-        $response = array("success" => true, "message" => "Patient added successfully");
+    // Check if the query was successful
+    if ($stmt->rowCount() > 0) {
+        $response['success'] = true;
+        $response['message'] = 'Patient added successfully.';
     } else {
-        throw new Exception('Failed to execute the insert query.');
+        $response['success'] = false;
+        $response['message'] = 'Failed to add patient.';
     }
-
-    // Return response
-    echo $response['message'];
-} catch (Exception $e) {
-    // Log error for debugging
-    error_log("Error: " . $e->getMessage());
-    // Return error message
-    echo 'An error occurred while adding the patient: ' . $e->getMessage();
+} catch(PDOException $e) {
+    // Log error to a file or console
+    error_log("Error adding patient: " . $e->getMessage());
+    // Return JSON error response
+    $response['success'] = false;
+    $response['message'] = 'An error occurred while adding the patient.';
 }
 
-// Close statement and connection
-$stmt = null;
-$conn = null;
+echo json_encode($response);
 ?>

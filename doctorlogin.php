@@ -17,8 +17,8 @@ ini_set('display_errors', 1);
 
 $data = json_decode(file_get_contents("php://input"), true);
 
-$email = $data['email'];
-$password = $data['password'];
+$email = $data['email'] ?? '';
+$password = $data['password'] ?? '';
 
 if (empty($email) || empty($password)) {
     echo json_encode(['success' => false, 'message' => 'Email and password are required']);
@@ -36,6 +36,8 @@ try {
         error_log('Doctor record: ' . json_encode($doctor));  // Debugging statement
         // Check if the password matches
         if ($password === $doctor['password']) {
+            // Remove password from response for security reasons
+            unset($doctor['password']);
             echo json_encode([
                 'success' => true,
                 'message' => 'Login successful',
