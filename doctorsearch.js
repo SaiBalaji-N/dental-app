@@ -21,7 +21,7 @@ const DoctorSearch = () => {
   
     try {
       const searchTypeParam = searchType === 'name' ? 'name' : 'id';
-      const response = await fetch(`http://192.168.140.19/php/doctorsearch.php?searchType=${searchTypeParam}&searchValue=${value}`, {
+      const response = await fetch(`http://172.25.33.46/php/doctorsearch.php?searchType=${searchTypeParam}&searchValue=${value}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',

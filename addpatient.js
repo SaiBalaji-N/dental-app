@@ -4,7 +4,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import DateTimePicker from '@react-native-community/datetimepicker';
 import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
-import { getLoggedInDoctorEmail } from './doctorlogin'; // Import AsyncStorage getter function
+import { getLoggedInDoctorId } from './doctorlogin';
 
 const AddPatient = () => {
   const navigation = useNavigation();
@@ -26,10 +26,12 @@ const AddPatient = () => {
   const handleAddPatient = async () => {
     try {
       const formattedDate = appointmentDate.toISOString().split('T')[0];
-      const email = await getLoggedInDoctorEmail(); // Fetch logged-in doctor's email
-      if (email) {
-        const response = await axios.post('http://192.168.140.19/php/addpatient.php', new URLSearchParams({
-          doctor_email: email, // Send doctor's email to identify doctorid on server side
+      const currentDateTime = new Date().toISOString().slice(0, 19).replace('T', ' ');
+      const doctorid = await getLoggedInDoctorId(); // Fetch logged-in doctor's id
+
+      if (doctorid) {
+        const response = await axios.post('http://172.25.33.137/php/addpatient.php', {
+          doctorid: doctorid,
           patient_name: patientName,
           patient_age: patientAge,
           patient_gender: patientGender,
@@ -37,17 +39,20 @@ const AddPatient = () => {
           appointment_date: formattedDate,
           patient_mobile_number: patientMobileNumber,
           patient_address: patientAddress,
-        }));
+          datetime: currentDateTime,
+        });
 
-        if (response.data.includes("successfully")) {
+        console.log('Add Patient Response:', response.data);
+
+        if (response.data.success) {
           Alert.alert('Success', 'Patient added successfully', [
             { text: 'OK', onPress: () => navigation.navigate('DoctorDashboard') }
           ]);
         } else {
-          Alert.alert('Error', response.data || 'An error occurred');
+          Alert.alert('Error', response.data.message || 'An error occurred');
         }
       } else {
-        Alert.alert('Error', 'Doctor email not found.');
+        Alert.alert('Error', 'Doctor ID not found.');
       }
     } catch (error) {
       console.error('Error adding patient:', error);

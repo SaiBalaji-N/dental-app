@@ -17,6 +17,9 @@ import EditDoctorProfile from './editdoctorprofile';
 import EditPatientProfile from './editpatientprofile';
 import AddPatient from './addpatient';
 import DoctorAppointments from './doctorappointments';
+import DeepLearning from './deeplearning';
+import OperationDetails from './operation';
+import DisplayOperationDetails from './displayoperationdetails';
 
 const Stack = createStackNavigator();
 
@@ -40,6 +43,9 @@ export default function App() {
         <Stack.Screen name="PatientSearch" component={PatientSearch} options={{ title: 'PatientSearch', headerShown: false }}/>
         <Stack.Screen name="AddPatient" component={AddPatient} options={{ title: 'AddPatient', headerShown: false }}/>
         <Stack.Screen name="DoctorAppointments" component={DoctorAppointments} options={{ title: 'DoctorAppointments', headerShown: false }}/>
+        <Stack.Screen name="DeepLearning" component={DeepLearning} options={{ title: 'DeepLearning', headerShown: false }}/>
+        <Stack.Screen name="OperationDetails" component={OperationDetails} options={{ title: 'OperationDetails', headerShown: false }}/>
+        <Stack.Screen name="DisplayOperationDetails" component={DisplayOperationDetails} options={{ title: 'DisplayOperationDetails', headerShown: false }}/>
       </Stack.Navigator>
     </NavigationContainer>
   );

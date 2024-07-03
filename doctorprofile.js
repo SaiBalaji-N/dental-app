@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, Alert, Dimensions, ActivityIndicator } from 'react-native';
-import Icon from 'react-native-vector-icons/MaterialIcons';
+import Icon from 'react-native-vector-icons/MaterialIcons'; // Import Icon from react-native-vector-icons/MaterialIcons
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation } from '@react-navigation/native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 
 // Default profile image URL
 const defaultProfileImage = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcROfX2VHlWdQAY-aFbelHP0Tr7gHqYnobGVuarrNZo1pXfW2XvW3pbpzzyK6d2YBuU7D7c&usqp=CAU';
 
 const DoctorProfile = () => {
   const navigation = useNavigation();
+  const route = useRoute();
   const [doctorData, setDoctorData] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -18,7 +19,7 @@ const DoctorProfile = () => {
       try {
         const email = await AsyncStorage.getItem('@logged_in_doctor_email');
         if (email) {
-          const response = await axios.post('http://192.168.140.19/php/doctorprofile.php', { email });
+          const response = await axios.post('http://172.25.33.46/php/doctorprofile.php', { email });
           if (response.data.success) {
             setDoctorData(response.data.doctor);
           } else {
@@ -37,6 +38,12 @@ const DoctorProfile = () => {
 
     fetchDoctorProfile();
   }, []);
+
+  useEffect(() => {
+    if (route.params?.updatedDoctorData) {
+      setDoctorData(route.params.updatedDoctorData);
+    }
+  }, [route.params?.updatedDoctorData]);
 
   const goBack = () => {
     navigation.goBack();
@@ -84,7 +91,7 @@ const DoctorProfile = () => {
         <View style={[styles.profileContainer, { height: containerHeight }]}>
           {/* Profile Picture */}
           <View style={styles.profileImageContainer}>
-            <Image source={{ uri: doctorData.profilePhoto || defaultProfileImage }} style={styles.profileImage} />
+            <Image source={{ uri: defaultProfileImage }} style={styles.profileImage} />
           </View>
           <View style={styles.profileContent}>
             <View style={styles.row}>
@@ -98,10 +105,6 @@ const DoctorProfile = () => {
             <View style={styles.row}>
               <Text style={styles.heading}>Email:</Text>
               <Text style={styles.doctorInfo}>{doctorData.email}</Text>
-            </View>
-            <View style={styles.row}>
-              <Text style={styles.heading}>Age:</Text>
-              <Text style={styles.doctorInfo}>{doctorData.age}</Text>
             </View>
             <View style={styles.row}>
               <Text style={styles.heading}>Gender:</Text>
@@ -122,25 +125,6 @@ const DoctorProfile = () => {
           </View>
         </View>
       </ScrollView>
-
-      <View style={styles.bottomBar}>
-        <TouchableOpacity style={styles.bottomBarButton} onPress={() => navigation.navigate('Home')}>
-          <Icon name="home" size={30} color="#075eec" />
-          <Text style={styles.bottomBarText}>Home</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.bottomBarButton} onPress={() => navigation.navigate('Search')}>
-          <Icon name="search" size={30} color="#075eec" />
-          <Text style={styles.bottomBarText}>Search</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.bottomBarButton} onPress={() => navigation.navigate('Notifications')}>
-          <Icon name="notifications" size={30} color="#075eec" />
-          <Text style={styles.bottomBarText}>Notifications</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.bottomBarButton} onPress={handleLogout}>
-          <Icon name="logout" size={30} color="#075eec" />
-          <Text style={styles.bottomBarText}>Logout</Text>
-        </TouchableOpacity>
-      </View>
     </View>
   );
 };
@@ -225,24 +209,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     marginBottom: 20,
-  },
-  bottomBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    backgroundColor: '#fff',
-    paddingVertical: 10,
-    borderTopWidth: 1,
-    borderTopColor: '#C9D3DB',
-  },
-  bottomBarButton: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  bottomBarText: {
-    fontSize: 14,
-    fontWeight: '600',
-    color: '#075eec',
-    marginTop: 5,
   },
 });
 

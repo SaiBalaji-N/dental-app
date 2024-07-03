@@ -115,10 +115,10 @@ const DoctorDashboard = () => {
   };
 
   const navigateToOperations = () => {
-    navigation.navigate('Operations'); // Navigate to Operations screen
+    navigation.navigate('DisplayOperationDetails'); // Navigate to DisplayOperationDetails screen
   };
 
-  const { name } = route.params; // Extracting name from route params
+  const name = route.params?.name || 'Doctor'; // Default to 'Doctor' if name is undefined
 
   return (
     <View style={styles.container}>
@@ -148,10 +148,29 @@ const DoctorDashboard = () => {
         {renderIndicators()}
       </View>
 
-      {/* Upper Container */}
       <View style={styles.upperContainer}>
-        <Text>Upper Container Content</Text>
-      </View>
+  <TouchableOpacity style={styles.viewAllButton}>
+    <Text style={styles.viewAllText}>View All</Text>
+  </TouchableOpacity>
+
+  <View style={styles.iconsContainer}>
+    <TouchableOpacity style={styles.iconContainer} onPress={openProfile}>
+      <Icon name="person" size={50} color="#075eec" />
+      <Text style={styles.largeIconText}>Profile 1</Text>
+    </TouchableOpacity>
+
+    <TouchableOpacity style={styles.iconContainer} onPress={openProfile}>
+      <Icon name="person" size={50} color="#075eec" />
+      <Text style={styles.largeIconText}>Profile 2</Text>
+    </TouchableOpacity>
+
+    <TouchableOpacity style={styles.iconContainer} onPress={openProfile}>
+      <Icon name="person" size={50} color="#075eec" />
+      <Text style={styles.largeIconText}>Profile 3</Text>
+    </TouchableOpacity>
+  </View>
+</View>
+
 
       {/* Lower Container */}
       <View style={styles.lowerContainer}>
@@ -240,147 +259,169 @@ const DoctorDashboard = () => {
     </View>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#e8ecf4',
-  },
-  topBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: '#075eec',
-    paddingTop: 30,
-    paddingBottom: 10,
-    paddingHorizontal: 20,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#fff',
-  },
-  iconContainer: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  adsScrollContainer: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  adContainer: {
-    width: windowWidth * 0.8,
-    height: 200,
-    borderRadius: 10,
-    overflow: 'hidden',
-    marginHorizontal: windowWidth * 0.1,
-  },
-  adImage: {
-    width: '100%',
-    height: '100%',
-  },
-  indicatorsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  indicator: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: '#ccc',
-    marginHorizontal: 5,
-  },
-  activeIndicator: {
-    backgroundColor: '#075eec',
-  },
-  upperContainer: {
-    width: windowWidth * 0.8,
-    height: 140,
-    borderRadius: 10,
-    backgroundColor: '#f2f2f2',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginLeft: 'auto',
-    marginRight: 'auto',
-    marginTop: 20,
-    marginBottom: 20,
-    overflow: 'hidden',
-  },
-  lowerContainer: {
-    width: windowWidth * 0.8,
-    height: 200,
-    borderRadius: 10,
-    backgroundColor: '#f2f2f2',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    marginLeft: 'auto',
-    marginRight: 'auto',
-    marginTop: 20,
-    marginBottom: 20,
-    overflow: 'hidden',
-    flexDirection: 'row', // Arrange items in a row
-  },
-  largeIconText: {
-    marginTop: 10,
-    fontSize: 14,
-    color: '#075eec',
-    textAlign: 'center',
-  },
-  content: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  bottomBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    backgroundColor: '#fff',
-    paddingVertical: 10,
-    borderTopWidth: 1,
-    borderTopColor: '#C9D3DB',
-  },
-  bottomBarButton: {
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  bottomBarText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#075eec',
-    marginTop: 5,
-  },
-  drawer: {
-    position: 'absolute',
-    left: 0,
-    top: 0,
-    bottom: 0,
-    width: '80%',
-    backgroundColor: '#fff',
-    paddingTop: 70,
-    paddingHorizontal: 20,
-    borderRightWidth: 1,
-    borderColor: '#ddd',
-    zIndex: 10,
-  },
-  drawerItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingVertical: 20,
-    borderBottomWidth: 1,
-    borderColor: '#ddd',
-  },
-  drawerText: {
-    marginLeft: 20,
-    fontSize: 16,
-    color: '#333',
-  },
-  drawerClose: {
-    position: 'absolute',
-    top: 40,
-    right: 20,
-  },
+backgroundColor: '#e8ecf4',
+},
+topBar: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  alignItems: 'center',
+  backgroundColor: '#075eec',
+  paddingTop: 30,
+  paddingBottom: 10,
+  paddingHorizontal: 20,
+},
+title: {
+  fontSize: 20,
+  fontWeight: 'bold',
+  color: '#fff',
+},
+iconsContainer: {
+  flexDirection: 'row',
+  justifyContent: 'space-around', // Adjust spacing around icons
+  marginTop: 20,
+  paddingHorizontal: -50, // Add padding to control spacing
+},
+adsScrollContainer: {
+  alignItems: 'center',
+  justifyContent: 'center',
+},
+adContainer: {
+  width: windowWidth * 0.8,
+  height: 200,
+  borderRadius: 10,
+  overflow: 'hidden',
+  marginHorizontal: windowWidth * 0.1,
+},
+adImage: {
+  width: '100%',
+  height: '100%',
+},
+indicatorsContainer: {
+  flexDirection: 'row',
+  justifyContent: 'center',
+  alignItems: 'center',
+  marginTop: 10,
+},
+indicator: {
+  width: 8,
+  height: 8,
+  borderRadius: 4,
+  backgroundColor: '#ccc',
+  marginHorizontal: 5,
+},
+activeIndicator: {
+  backgroundColor: '#075eec',
+},
+upperContainer: {
+  width: windowWidth * 0.8,
+  height: 140,
+  borderRadius: 10,
+  backgroundColor: '#f2f2f2',
+  justifyContent: 'center',
+  alignItems: 'center',
+  marginLeft: 'auto',
+  marginRight: 'auto',
+  marginTop: 20,
+  marginBottom: 20,
+  overflow: 'hidden',
+  position: 'relative',
+},
+viewAllButton: {
+  position: 'absolute',
+  top: 5,
+  right: 10,
+  backgroundColor: '#075eec',
+  paddingVertical: 5,
+  paddingHorizontal: 10,
+  borderRadius: 5,
+  zIndex: 1, // Ensure the button is above the icons
+},
+viewAllText: {
+  color: '#fff',
+  fontSize: 14,
+  fontWeight: 'bold',
+},
+iconContainer: {
+  alignItems: 'center',
+  marginHorizontal: 15,
+  zIndex: 0, // Ensure icons are behind the viewAllButton
+},
+lowerContainer: {
+  width: windowWidth * 0.8,
+  height: 200,
+  borderRadius: 10,
+  backgroundColor: '#f2f2f2',
+  justifyContent: 'space-around',
+  alignItems: 'center',
+  marginLeft: 'auto',
+  marginRight: 'auto',
+  marginTop: 20,
+  marginBottom: 0,
+  overflow: 'hidden',
+  flexDirection: 'row', // Arrange items in a row
+},
+largeIconText: {
+  marginTop: 10,
+  fontSize: 14,
+  color: '#075eec',
+  textAlign: 'center',
+},
+content: {
+  flex: 1,
+  justifyContent: 'center',
+  alignItems: 'center',
+},
+bottomBar: {
+  flexDirection: 'row',
+  justifyContent: 'space-around',
+  backgroundColor: '#fff',
+  paddingVertical: 10,
+  borderTopWidth: 1,
+  borderTopColor: '#C9D3DB',
+},
+bottomBarButton: {
+  justifyContent: 'center',
+  alignItems: 'center',
+},
+bottomBarText: {
+  fontSize: 12,
+  fontWeight: '600',
+  color: '#075eec',
+  marginTop: 5,
+},
+drawer: {
+  position: 'absolute',
+  left: 0,
+  top: 0,
+  bottom: 0,
+  width: '80%',
+  backgroundColor: '#fff',
+  paddingTop: 70,
+  paddingHorizontal: 20,
+  borderRightWidth: 1,
+  borderColor: '#ddd',
+  zIndex: 10,
+},
+drawerItem: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  paddingVertical: 20,
+  borderBottomWidth: 1,
+  borderColor: '#ddd',
+},
+drawerText: {
+  marginLeft: 20,
+  fontSize: 16,
+  color: '#333',
+},
+drawerClose: {
+  position: 'absolute',
+  top: 40,
+  right: 20,
+},
 });
 
 export default DoctorDashboard;

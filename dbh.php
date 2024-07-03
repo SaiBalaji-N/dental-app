@@ -6,12 +6,9 @@ $dbname = "dental";
 
 try {
     $conn = new PDO("mysql:host=$host;dbname=$dbname", $username, $password);
+    // Set the PDO error mode to exception
     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 } catch(PDOException $e) {
-    // Log error to a file
-    error_log("Connection failed: " . $e->getMessage());
-    // Return JSON error response
-    echo json_encode(['success' => false, 'message' => 'Connection failed']);
-    exit;
+    echo "Connection failed: " . $e->getMessage();
 }
 ?>

@@ -15,23 +15,28 @@ const Login = ({ route }) => {
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post('YOUR_BACKEND_LOGIN_ENDPOINT', {
+      let loginEndpoint = '';
+      
+      if (role === 'doctor') {
+        loginEndpoint = 'http://192.168.140.19/php/doctorsignup.php';
+      } else if (role === 'patient') {
+        loginEndpoint = 'http://192.168.140.19/php/patientsignup.php';
+      } else {
+        console.error('Invalid role selected');
+        return;
+      }
+
+      const response = await axios.post(loginEndpoint, {
         email: form.email,
         password: form.password,
-        role: role, // Include role in your request payload if needed
       });
 
+      console.log('Login response:', response.data);
+
       if (response.data.success) {
-        // Navigate to the appropriate screen based on role
-        if (role === 'patient') {
-          navigation.navigate('PatientHome');
-        } else if (role === 'doctor') {
-          navigation.navigate('DoctorHome');
-        } else {
-          console.error('Role not properly passed from RoleSelection');
-        }
+        navigation.navigate('Dashboard'); // Navigate to dashboard on successful login
       } else {
-        Alert.alert('Login Failed', 'Email or password is incorrect.');
+        Alert.alert('Login Failed', response.data.message || 'Email or password is incorrect.');
       }
     } catch (error) {
       console.error('Login error:', error);
@@ -49,7 +54,7 @@ const Login = ({ route }) => {
     } else if (role === 'doctor') {
       navigation.navigate('DoctorSignup');
     } else {
-      console.error('Role not properly passed from RoleSelection');
+      console.error('Invalid role selected');
     }
   };
 
@@ -112,18 +117,6 @@ const styles = StyleSheet.create({
     width: 80,
     height: 80,
     marginBottom: 36,
-  },
-  title: {
-    fontSize: 31,
-    fontWeight: '700',
-    color: '#1D2A32',
-    marginBottom: 6,
-  },
-  subtitle: {
-    fontSize: 15,
-    fontWeight: '500',
-    color: '#929292',
-    marginBottom: 24,
   },
   form: {
     width: '100%',

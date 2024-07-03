@@ -14,7 +14,7 @@ const DoctorSignup = ({ navigation }) => {
   });
 
   const handleSignup = () => {
-    axios.post('http://192.168.140.19/php/doctorsignup.php', {
+    axios.post('http://172.25.33.137/php/doctorsignup.php', {
       action: 'DoctorSignup', // Include 'action' parameter
       name: form.name,
       email: form.email,

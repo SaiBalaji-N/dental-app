@@ -59,43 +59,56 @@ const EditPatientProfile = () => {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>Edit Profile</Text>
-      <TextInput
-        style={styles.input}
-        value={patientData.Name || ''}
-        onChangeText={(text) => handleChange('Name', text)}
-        placeholder="Name"
-      />
-      <TextInput
-        style={styles.input}
-        value={patientData.email || ''}
-        onChangeText={(text) => handleChange('email', text)}
-        placeholder="Email"
-        keyboardType="email-address"
-      />
-      <TextInput
-        style={styles.input}
-        value={patientData.gender || ''}
-        onChangeText={(text) => handleChange('gender', text)}
-        placeholder="Gender"
-      />
-      <TextInput
-        style={styles.input}
-        value={patientData.contactno || ''}
-        onChangeText={(text) => handleChange('contactno', text)}
-        placeholder="Contact Number"
-        keyboardType="phone-pad"
-      />
-      <TextInput
-        style={styles.input}
-        value={patientData.age?.toString() || ''}
-        onChangeText={(text) => handleChange('age', text)}
-        placeholder="Age"
-        keyboardType="numeric"
-      />
-      {/* Add more fields as needed */}
-
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Name</Text>
+        <TextInput
+          style={styles.input}
+          value={patientData.Name || ''}
+          onChangeText={(text) => handleChange('Name', text)}
+          placeholder="Enter Name"
+        />
+      </View>
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Email</Text>
+        <TextInput
+          style={styles.input}
+          value={patientData.email || ''}
+          onChangeText={(text) => handleChange('email', text)}
+          placeholder="Enter Email"
+          keyboardType="email-address"
+        />
+      </View>
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Gender</Text>
+        <TextInput
+          style={styles.input}
+          value={patientData.gender || ''}
+          onChangeText={(text) => handleChange('gender', text)}
+          placeholder="Enter Gender"
+        />
+      </View>
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Contact Number</Text>
+        <TextInput
+          style={styles.input}
+          value={patientData.contactno || ''}
+          onChangeText={(text) => handleChange('contactno', text)}
+          placeholder="Enter Contact Number"
+          keyboardType="phone-pad"
+        />
+      </View>
+      <View style={styles.inputContainer}>
+        <Text style={styles.label}>Age</Text>
+        <TextInput
+          style={styles.input}
+          value={patientData.age?.toString() || ''}
+          onChangeText={(text) => handleChange('age', text)}
+          placeholder="Enter Age"
+          keyboardType="numeric"
+        />
+      </View>
       <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-        <Text style={styles.saveButtonText}>Save</Text>
+        <Text style={styles.saveButtonText}>Save Changes</Text>
       </TouchableOpacity>
     </ScrollView>
   );
@@ -104,43 +117,53 @@ const EditPatientProfile = () => {
 const styles = StyleSheet.create({
   container: {
     flexGrow: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
     padding: 20,
-    backgroundColor: '#e8ecf4',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#e8ecf4',
   },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
     marginBottom: 20,
   },
-  input: {
+  inputContainer: {
     width: '100%',
-    padding: 10,
+    marginBottom: 16,
+  },
+  label: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 8,
+    color: '#333',
+  },
+  input: {
+    height: 50,
+    backgroundColor: '#fff',
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    fontSize: 15,
+    fontWeight: '500',
+    color: '#222',
     borderWidth: 1,
     borderColor: '#C9D3DB',
-    borderRadius: 8,
-    marginBottom: 10,
-    backgroundColor: '#fff',
   },
   saveButton: {
-    marginTop: 20,
     backgroundColor: '#075eec',
-    padding: 15,
-    borderRadius: 8,
+    borderRadius: 30,
+    paddingVertical: 15,
+    paddingHorizontal: 75,
     alignItems: 'center',
-    width: '100%',
+    marginTop: 20,
   },
   saveButtonText: {
     color: '#fff',
     fontSize: 18,
-    fontWeight: 'bold',
+    fontWeight: '600',
+  },
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });
 

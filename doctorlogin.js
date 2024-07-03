@@ -14,7 +14,7 @@ const DoctorLogin = () => {
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post('http://192.168.140.19/php/doctorlogin.php', {
+      const response = await axios.post('http://172.25.33.137/php/doctorlogin.php', {
         email: form.email,
         password: form.password,
       }, {
@@ -26,11 +26,13 @@ const DoctorLogin = () => {
       console.log('Login response:', response.data);
 
       if (response.data.success) {
-        // Store email and name in AsyncStorage upon successful login
-        await AsyncStorage.setItem('@logged_in_doctor_email', form.email);
-        await AsyncStorage.setItem('@logged_in_doctor_name', response.data.doctor.name);
+        const doctor = response.data.doctor;
+        // Store doctor data in AsyncStorage upon successful login
+        await AsyncStorage.setItem('@logged_in_doctor', JSON.stringify(doctor));
+        await AsyncStorage.setItem('loggedInDoctorEmail', doctor.email); // Store email for later use
+        await AsyncStorage.setItem('loggedInDoctorId', doctor.doctorid.toString()); // Store doctorid as string
 
-        navigation.navigate('DoctorDashboard', { name: response.data.doctor.name });
+        navigation.navigate('DoctorDashboard', { name: doctor.name });
       } else {
         Alert.alert('Login Failed', response.data.message || 'Email or password is incorrect.');
       }
@@ -163,24 +165,63 @@ const styles = StyleSheet.create({
     color: '#222',
   },
 });
-
-export const getLoggedInDoctorEmail = async () => {
+export const storeLoggedInDoctor = async (doctor) => {
   try {
-    const email = await AsyncStorage.getItem('@logged_in_doctor_email');
-    return email;
+    await AsyncStorage.setItem('@logged_in_doctor', JSON.stringify(doctor));
   } catch (error) {
-    console.error('Error retrieving logged-in doctor email:', error);
+    console.error('Error storing doctor:', error);
+  }
+};
+
+export const getLoggedInDoctor = async () => {
+  try {
+    const jsonValue = await AsyncStorage.getItem('@logged_in_doctor');
+    return jsonValue != null ? JSON.parse(jsonValue) : null;
+  } catch (error) {
+    console.error('Error fetching doctor:', error);
     return null;
   }
 };
 
-export const getLoggedInDoctorName = async () => {
+export const getLoggedInDoctorId = async () => {
   try {
-    const name = await AsyncStorage.getItem('@logged_in_doctor_name');
-    return name;
+    const doctor = await getLoggedInDoctor();
+    return doctor ? doctor.doctorid : null;
   } catch (error) {
-    console.error('Error retrieving logged-in doctor name:', error);
+    console.error('Error fetching doctor id:', error);
     return null;
+  }
+};
+
+// Function to handle login
+export const handleLogin = async (email, password) => {
+  try {
+    const response = await axios.post('http://172.25.33.137/php/doctorlogin.php', {
+      email: email,
+      password: password,
+    }, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    console.log('Login response:', response.data);
+
+    if (response.data.success) {
+      const doctor = response.data.doctor;
+      await storeLoggedInDoctor(doctor); // Store doctor data in AsyncStorage
+      await AsyncStorage.setItem('loggedInDoctorEmail', doctor.email); // Store email for later use
+      await AsyncStorage.setItem('loggedInDoctorId', doctor.doctorid.toString()); // Store doctorid as string
+
+      // Navigate to dashboard or wherever needed
+      // navigation.navigate('DoctorDashboard', { name: doctor.name });
+      return { success: true, doctor };
+    } else {
+      return { success: false, message: response.data.message || 'Email or password is incorrect.' };
+    }
+  } catch (error) {
+    console.error('Login error:', error);
+    return { success: false, message: 'An error occurred while logging in.' };
   }
 };
 

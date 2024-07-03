@@ -2,17 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation } from '@react-navigation/native';
 
-const DoctorAppointments = () => {
-  const [upcomingAppointments, setUpcomingAppointments] = useState([]);
-  const [completedAppointments, setCompletedAppointments] = useState([]);
+const DisplayOperationDetails = () => {
+  const [upcomingOperations, setUpcomingOperations] = useState([]);
+  const [completedOperations, setCompletedOperations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('upcoming');
-  const navigation = useNavigation();
 
   useEffect(() => {
-    const fetchAppointments = async () => {
+    const fetchOperations = async () => {
       try {
         const doctorId = await AsyncStorage.getItem('loggedInDoctorId');
         if (!doctorId) {
@@ -21,34 +19,46 @@ const DoctorAppointments = () => {
           return;
         }
 
-        const upcomingResponse = await axios.post(
-          'http://172.25.33.137/php/fetchdoctorappointments.php',
-          { doctorid: doctorId, appointment_type: 'upcoming' }
+        const response = await axios.post(
+          'http://172.25.33.137/php/fetchoperationdetails.php',
+          { doctorid: doctorId }
         );
-        setUpcomingAppointments(upcomingResponse.data.appointments || []);
 
-        const completedResponse = await axios.post(
-          'http://172.25.33.137/php/fetchdoctorappointments.php',
-          { doctorid: doctorId, appointment_type: 'completed' }
-        );
-        setCompletedAppointments(completedResponse.data.appointments || []);
+        const operations = response.data.operations || [];
+        const today = new Date().toISOString().split('T')[0];
 
+        const upcomingOps = operations.filter(op => new Date(op.operation_date) >= new Date(today));
+        const completedOps = operations.filter(op => new Date(op.operation_date) < new Date(today));
+
+        setUpcomingOperations(upcomingOps);
+        setCompletedOperations(completedOps);
         setLoading(false);
       } catch (error) {
-        console.error('Error fetching appointments:', error);
+        console.error('Error fetching operations:', error);
         setLoading(false);
       }
     };
 
-    fetchAppointments();
+    fetchOperations();
   }, []);
 
   const handleTabPress = (tab) => {
     setActiveTab(tab);
   };
 
-  const handleAppointmentPress = (appointment) => {
-    navigation.navigate('DeepLearning', { appointment });
+  const renderOperations = (operations) => {
+    if (!operations || operations.length === 0) {
+      return <Text style={styles.noOperationsText}>No operations found</Text>;
+    }
+
+    return operations.map((operation, index) => (
+      <View key={index} style={styles.operationContainer}>
+        <Text style={styles.operationText}>Patient Name: {operation.patient_name}</Text>
+        <Text style={styles.operationText}>Teeth Measurements: {operation.teeth_measurements}</Text>
+        <Text style={styles.operationText}>Material: {operation.teeth_material}</Text>
+        <Text style={styles.operationText}>Operation Date: {operation.operation_date}</Text>
+      </View>
+    ));
   };
 
   if (loading) {
@@ -58,25 +68,6 @@ const DoctorAppointments = () => {
       </View>
     );
   }
-
-  const renderAppointments = (appointments) => {
-    if (!appointments || appointments.length === 0) {
-      return <Text style={styles.noAppointmentsText}>No appointments found</Text>;
-    }
-
-    return appointments.map((appointment, index) => (
-      <TouchableOpacity
-        key={index}
-        style={styles.appointmentContainer}
-        onPress={() => handleAppointmentPress(appointment)}
-      >
-        <Text style={styles.appointmentText}>Patient Name: {appointment.patient_name}</Text>
-        <Text style={styles.appointmentText}>Gender: {appointment.patient_gender}</Text>
-        <Text style={styles.appointmentText}>Problem: {appointment.patient_problem}</Text>
-        <Text style={styles.appointmentText}>Appointment Date: {appointment.appointment_date}</Text>
-      </TouchableOpacity>
-    ));
-  };
 
   return (
     <View style={styles.container}>
@@ -95,7 +86,7 @@ const DoctorAppointments = () => {
         </TouchableOpacity>
       </View>
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
-        {activeTab === 'upcoming' ? renderAppointments(upcomingAppointments) : renderAppointments(completedAppointments)}
+        {activeTab === 'upcoming' ? renderOperations(upcomingOperations) : renderOperations(completedOperations)}
       </ScrollView>
     </View>
   );
@@ -136,7 +127,7 @@ const styles = StyleSheet.create({
   scrollViewContent: {
     paddingBottom: 20,
   },
-  appointmentContainer: {
+  operationContainer: {
     padding: 15,
     borderRadius: 12,
     backgroundColor: '#fff',
@@ -147,13 +138,13 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 5 },
     elevation: 3,
   },
-  appointmentText: {
+  operationText: {
     fontSize: 16,
     fontWeight: '500',
     color: '#1D2A32',
     marginBottom: 5,
   },
-  noAppointmentsText: {
+  noOperationsText: {
     fontSize: 16,
     fontWeight: '500',
     color: '#6b7280',
@@ -162,4 +153,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default DoctorAppointments;
+export default DisplayOperationDetails;
